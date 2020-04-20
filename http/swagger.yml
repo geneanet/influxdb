@@ -339,6 +339,148 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  "/dbrp":
+    get:
+      operationId: GetDBRPList
+      tags:
+        - DBRPEndpoints
+      summary: List all database retention policy mapping
+      parameters:
+        - $ref: "#/components/parameters/TraceSpan"
+      responses:
+        "200":
+          description: A list of all database retention policy mappings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DBRPs"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: PostDBRP
+      tags:
+        - DBRPEndpoints
+      summary: Add a database retention policy mapping
+      parameters:
+        - $ref: "#/components/parameters/TraceSpan"
+      requestBody:
+        description: database retention policy to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DBRP"
+      responses:
+        "201":
+          description: The label added to the template
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DBRP"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  "/dbrp/{dbrpID}":
+    get:
+      operationId: GetDBRPID
+      tags:
+        - DBRPEndpoints
+      summary: Get a database retention policy mapping
+      parameters:
+        - $ref: "#/components/parameters/TraceSpan"
+        - in: path
+          name: dbrpID
+          schema:
+            type: string
+          required: true
+          description: The database retention policy magging ID.
+      responses:
+        "200":
+          description: The database retention policy requested
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DBRP"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      operationId: PatchDBRPID
+      tags:
+        - DBRPEndpoints
+      summary: Update a database retention policy mapping
+      requestBody:
+        description: Check update to apply
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DBRPUpdate"
+      parameters:
+        - $ref: "#/components/parameters/TraceSpan"
+        - in: path
+          name: dbrpID
+          schema:
+            type: string
+          required: true
+          description: The database retention policy mapping.
+      responses:
+        "200":
+          description: An updated mapping
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DBRP"
+        "404":
+          description: The mapping was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: DeleteDBRPID
+      tags:
+        - DBRPEndpoints
+      summary: Delete a database retention policy
+      parameters:
+        - $ref: "#/components/parameters/TraceSpan"
+        - in: path
+          name: dbrpID
+          schema:
+            type: string
+          required: true
+          description: The database retention policy mapping.
+      responses:
+        "204":
+          description: Delete has been accepted
+        "404":
+          description: The endpoint was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /telegraf/plugins:
     get:
       operationId: GetTelegrafPlugins
@@ -11057,6 +11199,47 @@ components:
     NotificationEndpointType:
       type: string
       enum: ['slack', 'pagerduty', 'http']
+    DBRP:
+      properties:
+        id:
+          type: string
+          description: the mapping identifier
+          readOnly: true
+        orgID:
+          type: string
+          description: the organization ID that owns this mapping.
+        bucketID:
+          required: true
+          type: string
+          description: the bucket ID used as target for the translation.
+        database:
+          type: string
+          description: InfluxDB v1 database
+          required: true
+        retention_policy:
+          type: string
+          description: InfluxDB v1 retention policy
+        default:
+          required: true
+          type: boolean
+          description: Specify if this mapping represents the default retention policy for the database specificed.
+          required: true
+        links:
+          $ref: "#/components/schemas/Links"
+    DBRPs:
+      properties:
+        notificationEndpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/DBRP"
+        links:
+          $ref: "#/components/schemas/Links"
+    DBRPUpdate:
+      properties:
+        default:
+          type: boolean
+        links:
+          $ref: "#/components/schemas/Links"
   securitySchemes:
     BasicAuth:
       type: http
