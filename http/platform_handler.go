@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/influxdata/influxdb/v2"
+	"github.com/influxdata/influxdb/v2/kit/feature"
 	kithttp "github.com/influxdata/influxdb/v2/kit/transport/http"
 )
 
@@ -17,8 +18,10 @@ type PlatformHandler struct {
 
 // NewPlatformHandler returns a platform handler that serves the API and associated assets.
 func NewPlatformHandler(b *APIBackend, us influxdb.UserService, opts ...APIHandlerOptFn) *PlatformHandler {
+	handler := feature.NewHandler(b.Logger, b.Flagger, feature.Flags(), NewAPIHandler(b, opts...))
+
 	h := NewAuthenticationHandler(b.Logger, b.HTTPErrorHandler)
-	h.Handler = NewAPIHandler(b, opts...)
+	h.Handler = handler
 	h.AuthorizationService = b.AuthorizationService
 	h.SessionService = b.SessionService
 	h.SessionRenewDisabled = b.SessionRenewDisabled
