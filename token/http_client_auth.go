@@ -8,8 +8,6 @@ import (
 	"github.com/influxdata/influxdb/v2/pkg/httpc"
 )
 
-const prefixAuthorization = "/api/v2/authorizations"
-
 var _ influxdb.AuthorizationService = (*AuthorizationClientService)(nil)
 
 // AuthorizationClientService connects to Influx via HTTP using tokens to manage authorizations

@@ -22,14 +22,29 @@ func initAuthorizationService(f itesting.AuthorizationFields, t *testing.T) (inf
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	storage, err := token.NewStore(s)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	svc := token.NewService(storage)
-
 	ctx := context.Background()
+	svc := token.NewService(storage)
+	kvService := kv.NewService(zaptest.NewLogger(t), s)
+	kvService.Initialize(ctx)
+
+	for _, u := range f.Users {
+		if err := kvService.CreateUser(ctx, u); err != nil {
+			t.Fatalf("failed to populate users")
+		}
+	}
+
+	for _, o := range f.Orgs {
+		if err := kvService.CreateOrganization(ctx, o); err != nil {
+			t.Fatalf("failed to populate orgs")
+		}
+	}
+
 	for _, u := range f.Authorizations {
 		if err := svc.CreateAuthorization(ctx, u); err != nil {
 			t.Fatalf("failed to populate authorizations")
@@ -38,7 +53,7 @@ func initAuthorizationService(f itesting.AuthorizationFields, t *testing.T) (inf
 
 	handler := token.NewHTTPAuthHandler(zaptest.NewLogger(t), svc)
 	r := chi.NewRouter()
-	r.Mount("/api/v2/authorizations", handler)
+	r.Mount(handler.Prefix(), handler)
 	server := httptest.NewServer(r)
 	httpClient, err := ihttp.NewHTTPClient(server.URL, "", false)
 	if err != nil {

@@ -53,6 +53,12 @@ func NewHTTPAuthHandler(log *zap.Logger, authService influxdb.AuthorizationServi
 	return h
 }
 
+const prefixAuthorization = "/api/v2/authorizations"
+
+func (h *AuthHandler) Prefix() string {
+	return prefixAuthorization
+}
+
 // handlePostAuthorization is the HTTP handler for the POST /api/v2/authorizations route.
 func (h *AuthHandler) handlePostAuthorization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

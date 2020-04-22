@@ -12,6 +12,7 @@ var _ influxdb.AuthorizationService = (*Service)(nil)
 func (s *Service) CreateAuthorization(ctx context.Context, a *influxdb.Authorization) error {
 	// // todo (al): we also need to check if the user has write permissions
 	// can the auth middleware layer do this?
+	// http layer can handle adding user id...?
 	// if u, err := s.findUserByID(ctx, tx, a.UserID); err != nil {
 	// 	return influxdb.ErrUnableToCreateToken
 	// }
@@ -21,11 +22,6 @@ func (s *Service) CreateAuthorization(ctx context.Context, a *influxdb.Authoriza
 			Err: err,
 		}
 	}
-
-	// TODO (al) put this somewhere -> storage?
-	// if err := s.store.uniqueAuthToken(ctx, tx, a); err != nil {
-	// 	return err
-	// }
 
 	if a.Token == "" {
 		token, err := s.tokenGenerator.Token()
@@ -37,7 +33,9 @@ func (s *Service) CreateAuthorization(ctx context.Context, a *influxdb.Authoriza
 		a.Token = token
 	}
 
-	return nil
+	return s.store.Update(ctx, func(tx kv.Tx) error {
+		return s.store.CreateAuthorization(ctx, tx, a)
+	})
 }
 
 func (s *Service) FindAuthorizationByID(ctx context.Context, id influxdb.ID) (*influxdb.Authorization, error) {

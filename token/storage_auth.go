@@ -70,6 +70,10 @@ func (s *Store) CreateAuthorization(ctx context.Context, tx kv.Tx, a *influxdb.A
 		a.ID = id
 	}
 
+	if err := s.uniqueAuthToken(ctx, tx, a); err != nil {
+		return err // todo (al) special influxdb error type
+	}
+
 	v, err := encodeAuthorization(a)
 	if err != nil {
 		return &influxdb.Error{
@@ -85,10 +89,6 @@ func (s *Store) CreateAuthorization(ctx context.Context, tx kv.Tx, a *influxdb.A
 
 	idx, err := authIndexBucket(tx)
 	if err != nil {
-		return err
-	}
-
-	if err := s.uniqueAuthToken(ctx, tx, a); err != nil {
 		return err
 	}
 
