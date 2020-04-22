@@ -26,11 +26,13 @@ type AuthHandler struct {
 }
 
 // NewHTTPAuthHandler constructs a new http server.
-func NewHTTPAuthHandler(log *zap.Logger, authService influxdb.AuthorizationService) *AuthHandler {
+func NewHTTPAuthHandler(log *zap.Logger, authService influxdb.AuthorizationService, tenantService influxdb.TenantService, lookupService influxdb.LookupService) *AuthHandler {
 	h := &AuthHandler{
-		api:     kithttp.NewAPI(kithttp.WithLog(log)),
-		log:     log,
-		authSvc: authService,
+		api:           kithttp.NewAPI(kithttp.WithLog(log)),
+		log:           log,
+		authSvc:       authService,
+		tenantService: tenantService,
+		lookupService: lookupService,
 	}
 
 	r := chi.NewRouter()
@@ -340,6 +342,8 @@ func (h *AuthHandler) handleGetAuthorizations(w http.ResponseWriter, r *http.Req
 
 	opts := influxdb.FindOptions{}
 	as, _, err := h.authSvc.FindAuthorizations(ctx, req.filter, opts)
+	fmt.Println(as[0])
+	fmt.Println(as[0].OrgID)
 	if err != nil {
 		h.api.Err(w, err)
 		return
