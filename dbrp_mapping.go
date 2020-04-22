@@ -7,6 +7,20 @@ import (
 	"unicode"
 )
 
+type DBRPMappingServiceV2 interface {
+	// FindBy returns the dbrp mapping the for cluster, db and rp.
+	FindByID(context.Context, ID) (*DBRPMapping, error)
+	// FindMany returns a list of dbrp mappings that match filter and the total count of matching dbrp mappings.
+	FindMany(context.Context, DBRPMappingFilter, ...FindOptions) ([]*DBRPMapping, int, error)
+	// Create creates a new dbrp mapping, if a different mapping exists an error is returned.
+	Create(context.Context, *DBRPMapping) error
+	// Update a new dbrp mapping
+	Update(context.Context, *DBRPMapping) error
+	// Delete removes a dbrp mapping.
+	// Deleting a mapping that does not exists is not an error.
+	Delete(context.Context, ID) error
+}
+
 // DBRPMappingService provides a mapping of cluster, database and retention policy to an organization ID and bucket ID.
 type DBRPMappingService interface {
 	// FindBy returns the dbrp mapping the for cluster, db and rp.
@@ -24,6 +38,7 @@ type DBRPMappingService interface {
 
 // DBRPMapping represents a mapping of a cluster, database and retention policy to an organization ID and bucket ID.
 type DBRPMapping struct {
+	ID              ID     `json:"id"`
 	Cluster         string `json:"cluster"`
 	Database        string `json:"database"`
 	RetentionPolicy string `json:"retention_policy"`
@@ -37,12 +52,6 @@ type DBRPMapping struct {
 
 // Validate reports any validation errors for the mapping.
 func (m DBRPMapping) Validate() error {
-	if !validName(m.Cluster) {
-		return &Error{
-			Code: EInvalid,
-			Msg:  "cluster must contain at least one character and only be letters, numbers, '_', '-', and '.'",
-		}
-	}
 	if !validName(m.Database) {
 		return &Error{
 			Code: EInvalid,
@@ -91,14 +100,15 @@ func (m *DBRPMapping) Equal(o *DBRPMapping) bool {
 	if m == nil || o == nil {
 		return false
 	}
-	return m.Cluster == o.Cluster &&
-		m.Database == o.Database &&
+	return m.Database == o.Database &&
 		m.RetentionPolicy == o.RetentionPolicy &&
 		m.Default == o.Default &&
 		m.OrganizationID.Valid() &&
 		o.OrganizationID.Valid() &&
 		m.BucketID.Valid() &&
 		o.BucketID.Valid() &&
+		o.ID.Valid() &&
+		m.ID == o.ID &&
 		m.OrganizationID == o.OrganizationID &&
 		m.BucketID == o.BucketID
 }
