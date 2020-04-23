@@ -23,6 +23,11 @@ func (s *Service) CreateAuthorization(ctx context.Context, a *influxdb.Authoriza
 		}
 	}
 
+	// todo (al): thorough notes that the checking is done in http, but eventually
+	// should be moved here if and when those lookups are removed from the HTTP layer\
+	// up for discussion though.
+	// make sure that org and user are real
+
 	if a.Token == "" {
 		token, err := s.tokenGenerator.Token()
 		if err != nil {

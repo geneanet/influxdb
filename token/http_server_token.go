@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/influxdata/httprouter"
 	"github.com/influxdata/influxdb/v2"
 	icontext "github.com/influxdata/influxdb/v2/context"
 	kithttp "github.com/influxdata/influxdb/v2/kit/transport/http"
@@ -42,12 +41,16 @@ func NewHTTPAuthHandler(log *zap.Logger, authService influxdb.AuthorizationServi
 		middleware.RealIP,
 	)
 
+	// we can rename service to token service todo (al)
+
 	r.Route("/", func(r chi.Router) {
 		r.Post("/", h.handlePostAuthorization)
 		r.Get("/", h.handleGetAuthorizations)
 
 		r.Route("/{id}", func(r chi.Router) {
 			r.Get("/", h.handleGetAuthorization)
+			// add delete and update handlers todo (al)
+			// r.Delete("/", h.handleDeleteAuthorization)
 		})
 	})
 
@@ -64,31 +67,53 @@ func (h *AuthHandler) Prefix() string {
 // handlePostAuthorization is the HTTP handler for the POST /api/v2/authorizations route.
 func (h *AuthHandler) handlePostAuthorization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
-	req, err := decodePostAuthorizationRequest(ctx, r)
-	if err != nil {
+	var a postAuthorizationRequest
+	if err := h.api.DecodeJSON(r.Body, &a); err != nil {
 		h.api.Err(w, err)
 		return
 	}
+	// todo (al) verify auth request is fine
+	// if err := a.OK(); err != nil {
+	// 	h.api.Err(w, err)
+	// 	return
+	// }
 
-	user, err := getAuthorizedUser(r, h.tenantService)
-	if err != nil {
-		h.api.Err(w, influxdb.ErrUnableToCreateToken)
-		return
-	}
+	// req, err := decodePostAuthorizationRequest(ctx, r)
+	// if err != nil {
+	// 	h.api.Err(w, err)
+	// 	return
+	// }
 
-	userID := user.ID
-	if req.UserID != nil && req.UserID.Valid() {
-		userID = *req.UserID
-	}
+	// todo (al) authorization should be moved to middleware
+	// what should take priority? id on the auth object or id on the context?
+	// user, err := getAuthorizedUser(r, h.tenantService)
+	// if err != nil {
+	// 	fmt.Println("the error we got was....", err) // authorizer not found on context
+	// 	h.api.Err(w, influxdb.ErrUnableToCreateToken)
+	// 	return
+	// }
 
-	auth := req.toInfluxdb(userID)
+	// also move this to auth layer....?
+	// userID := user.ID
+	// if a.UserID != nil && a.UserID.Valid() {
+	// 	userID = *a.UserID
+	// }
 
-	org, err := h.tenantService.FindOrganizationByID(ctx, auth.OrgID)
-	if err != nil {
-		h.api.Err(w, influxdb.ErrUnableToCreateToken)
-		return
-	}
+	// we can assume we have a User ID because if the request did not provide one, then the authorizer
+	// middleware gets it from the context
+	// user, err := h.tenantService.FindUserByID(ctx, *a.UserID)
+	// if err != nil {
+	// 	h.api.Err(w, influxdb.ErrUnableToCreateToken)
+	// 	return
+	// }
+
+	auth := a.toInfluxdb(*a.UserID)
+
+	// org, err := h.tenantService.FindOrganizationByID(ctx, auth.OrgID)
+	// if err != nil {
+	// 	h.api.Err(w, influxdb.ErrUnableToCreateToken)
+	// 	return
+	// }
 
 	if err := h.authSvc.CreateAuthorization(ctx, auth); err != nil {
 		h.api.Err(w, err)
@@ -108,7 +133,12 @@ func (h *AuthHandler) handlePostAuthorization(w http.ResponseWriter, r *http.Req
 	// 	return
 	// }
 
-	h.api.Respond(w, http.StatusCreated, newAuthResponse(auth, org, user, perms))
+	resp, err := h.newAuthResponse(ctx, auth, perms)
+	if err != nil {
+		h.api.Err(w, influxdb.ErrUnableToCreateToken)
+	}
+
+	h.api.Respond(w, http.StatusCreated, resp)
 }
 
 type postAuthorizationRequest struct {
@@ -134,7 +164,17 @@ type authResponse struct {
 	UpdatedAt   time.Time            `json:"updatedAt"`
 }
 
-func newAuthResponse(a *influxdb.Authorization, org *influxdb.Organization, user *influxdb.User, ps []permissionResponse) *authResponse {
+func (h *AuthHandler) newAuthResponse(ctx context.Context, a *influxdb.Authorization, ps []permissionResponse) (*authResponse, error) {
+	org, err := h.tenantService.FindOrganizationByID(ctx, a.OrgID)
+	if err != nil {
+		h.log.Info("Failed to get org", zap.String("handler", "getAuthorizations"), zap.String("orgID", a.OrgID.String()), zap.Error(err))
+		return nil, err
+	}
+	user, err := h.tenantService.FindUserByID(ctx, a.UserID)
+	if err != nil {
+		h.log.Info("Failed to get user", zap.String("userID", a.UserID.String()), zap.Error(err))
+		return nil, err
+	}
 	res := &authResponse{
 		ID:          a.ID,
 		Token:       a.Token,
@@ -152,7 +192,7 @@ func newAuthResponse(a *influxdb.Authorization, org *influxdb.Organization, user
 		CreatedAt: a.CreatedAt,
 		UpdatedAt: a.UpdatedAt,
 	}
-	return res
+	return res, nil
 }
 
 func (p *postAuthorizationRequest) toInfluxdb(userID influxdb.ID) *influxdb.Authorization {
@@ -371,33 +411,21 @@ func (h *AuthHandler) handleGetAuthorizations(w http.ResponseWriter, r *http.Req
 
 	auths := make([]*authResponse, 0, len(as))
 	for _, a := range as {
-		o, err := h.tenantService.FindOrganizationByID(ctx, a.OrgID)
-		if err != nil {
-			h.log.Info("Failed to get organization", zap.String("handler", "getAuthorizations"), zap.String("orgID", a.OrgID.String()), zap.Error(err))
-			continue
-		}
-
-		u, err := h.tenantService.FindUserByID(ctx, a.UserID)
-		if err != nil {
-			h.log.Info("Failed to get user", zap.String("handler", "getAuthorizations"), zap.String("userID", a.UserID.String()), zap.Error(err))
-			continue
-		}
-
 		ps, err := newPermissionsResponse(ctx, a.Permissions, h.lookupService)
 		if err != nil {
 			h.api.Err(w, err)
 			return
 		}
 
-		auths = append(auths, newAuthResponse(a, o, u, ps))
+		resp, err := h.newAuthResponse(ctx, a, ps)
+		if err != nil {
+			h.log.Info("Failed to create auth response", zap.String("handler", "getAuthorizations"))
+			continue
+		}
+		auths = append(auths, resp)
 	}
 
 	h.log.Debug("Auths retrieved ", zap.String("auths", fmt.Sprint(auths)))
-
-	// if err := encodeResponse(ctx, w, http.StatusOK, newAuthsResponse(auths)); err != nil {
-	// 	h.api.Err(w, err)
-	// 	return
-	// }
 
 	h.api.Respond(w, http.StatusOK, newAuthsResponse(auths))
 }
@@ -453,29 +481,23 @@ func decodeGetAuthorizationsRequest(ctx context.Context, r *http.Request) (*getA
 
 func (h *AuthHandler) handleGetAuthorization(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	req, err := decodeGetAuthorizationRequest(ctx, r)
+
+	id, err := influxdb.IDFromString(chi.URLParam(r, "id"))
 	if err != nil {
-		// TODO (al) logging middleware etc
-		h.log.Info("Failed to decode request", zap.String("handler", "getAuthorization"), zap.Error(err))
 		h.api.Err(w, err)
 		return
 	}
 
-	a, err := h.authSvc.FindAuthorizationByID(ctx, req.ID)
+	// if err != nil {
+	// 	// TODO (al) logging middleware etc
+	// 	h.log.Info("Failed to decode request", zap.String("handler", "getAuthorization"), zap.Error(err))
+	// 	h.api.Err(w, err)
+	// 	return
+	// }
+
+	a, err := h.authSvc.FindAuthorizationByID(ctx, *id)
 	if err != nil {
 		// Don't log here, it should already be handled by the service
-		h.api.Err(w, err)
-		return
-	}
-
-	o, err := h.tenantService.FindOrganizationByID(ctx, a.OrgID)
-	if err != nil {
-		h.api.Err(w, err)
-		return
-	}
-
-	u, err := h.tenantService.FindUserByID(ctx, a.UserID)
-	if err != nil {
 		h.api.Err(w, err)
 		return
 	}
@@ -488,29 +510,31 @@ func (h *AuthHandler) handleGetAuthorization(w http.ResponseWriter, r *http.Requ
 
 	h.log.Debug("Auth retrieved ", zap.String("auth", fmt.Sprint(a)))
 
-	h.api.Respond(w, http.StatusOK, newAuthResponse(a, o, u, ps))
+	resp, err := h.newAuthResponse(ctx, a, ps)
+
+	h.api.Respond(w, http.StatusOK, resp)
 }
 
-type getAuthorizationRequest struct {
-	ID influxdb.ID
-}
+// type getAuthorizationRequest struct {
+// 	ID influxdb.ID
+// }
 
-func decodeGetAuthorizationRequest(ctx context.Context, r *http.Request) (*getAuthorizationRequest, error) {
-	params := httprouter.ParamsFromContext(ctx)
-	id := params.ByName("id")
-	if id == "" {
-		return nil, &influxdb.Error{
-			Code: influxdb.EInvalid,
-			Msg:  "url missing id",
-		}
-	}
+// func decodeGetAuthorizationRequest(ctx context.Context, r *http.Request) (*getAuthorizationRequest, error) {
+// 	params := httprouter.ParamsFromContext(ctx)
+// 	id := params.ByName("id")
+// 	if id == "" {
+// 		return nil, &influxdb.Error{
+// 			Code: influxdb.EInvalid,
+// 			Msg:  "url missing id",
+// 		}
+// 	}
 
-	var i influxdb.ID
-	if err := i.DecodeFromString(id); err != nil {
-		return nil, err
-	}
+// 	var i influxdb.ID
+// 	if err := i.DecodeFromString(id); err != nil {
+// 		return nil, err
+// 	}
 
-	return &getAuthorizationRequest{
-		ID: i,
-	}, nil
-}
+// 	return &getAuthorizationRequest{
+// 		ID: i,
+// 	}, nil
+// }

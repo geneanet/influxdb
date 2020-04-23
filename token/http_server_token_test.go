@@ -10,6 +10,7 @@ import (
 	ihttp "github.com/influxdata/influxdb/v2/http"
 	"github.com/influxdata/influxdb/v2/inmem"
 	"github.com/influxdata/influxdb/v2/kv"
+	"github.com/influxdata/influxdb/v2/mock"
 	"github.com/influxdata/influxdb/v2/tenant"
 	itesting "github.com/influxdata/influxdb/v2/testing"
 	"github.com/influxdata/influxdb/v2/token"
@@ -33,12 +34,12 @@ func initAuthorizationService(f itesting.AuthorizationFields, t *testing.T) (inf
 	svc := token.NewService(storage)
 
 	// set up tenant service
-	s, err := tenant.NewStore(s)
+	store, err := tenant.NewStore(s)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ts := tenant.NewService(s)
+	ts := tenant.NewService(store)
 
 	for _, u := range f.Users {
 		if err := ts.CreateUser(ctx, u); err != nil {
@@ -58,10 +59,12 @@ func initAuthorizationService(f itesting.AuthorizationFields, t *testing.T) (inf
 		}
 	}
 
-	handler := token.NewHTTPAuthHandler(zaptest.NewLogger(t), svc), tenant
+	// todo (al): mock tenant service?
+	handler := token.NewHTTPAuthHandler(zaptest.NewLogger(t), svc, ts, mock.NewLookupService())
 	r := chi.NewRouter()
 	r.Mount(handler.Prefix(), handler)
 	server := httptest.NewServer(r)
+
 	httpClient, err := ihttp.NewHTTPClient(server.URL, "", false)
 	if err != nil {
 		t.Fatal(err)
@@ -83,5 +86,6 @@ func NewTestInmemStore(t *testing.T) (kv.Store, func(), error) {
 }
 
 func TestAuthorizationService(t *testing.T) {
+	t.Parallel()
 	itesting.AuthorizationService(initAuthorizationService, t)
 }
