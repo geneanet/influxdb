@@ -19,7 +19,7 @@ func TestAuth(t *testing.T) {
 
 	setup := func(t *testing.T, store *token.Store, tx kv.Tx) {
 		for i := 1; i <= 10; i++ {
-			err := store.CreateAuthorization(context.Background(), tx, &influxdb.Token{
+			err := store.CreateAuthorization(context.Background(), tx, &influxdb.Authorization{
 				ID:     influxdb.ID(i),
 				Token:  fmt.Sprintf("randomtoken%d", i),
 				OrgID:  influxdb.ID(i),
@@ -42,7 +42,7 @@ func TestAuth(t *testing.T) {
 			name:  "create",
 			setup: setup,
 			results: func(t *testing.T, store *token.Store, tx kv.Tx) {
-				auths, err := store.ListAuthorizations(context.Background(), tx, influxdb.TokenFilter{})
+				auths, err := store.ListAuthorizations(context.Background(), tx, influxdb.AuthorizationFilter{})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -51,9 +51,9 @@ func TestAuth(t *testing.T) {
 					t.Fatalf("expected 10 authorizations, got: %d", len(auths))
 				}
 
-				expected := []*influxdb.Token{}
+				expected := []*influxdb.Authorization{}
 				for i := 1; i <= 10; i++ {
-					expected = append(expected, &influxdb.Token{
+					expected = append(expected, &influxdb.Authorization{
 						ID:     influxdb.ID(i),
 						Token:  fmt.Sprintf("randomtoken%d", i),
 						OrgID:  influxdb.ID(i),
@@ -66,7 +66,7 @@ func TestAuth(t *testing.T) {
 				}
 
 				// should not be able to create two authorizations with identical tokens
-				err = store.CreateAuthorization(context.Background(), tx, &influxdb.Token{
+				err = store.CreateAuthorization(context.Background(), tx, &influxdb.Authorization{
 					ID:     influxdb.ID(1),
 					Token:  fmt.Sprintf("randomtoken%d", 1),
 					OrgID:  influxdb.ID(1),
