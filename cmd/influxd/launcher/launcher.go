@@ -21,6 +21,7 @@ import (
 	"github.com/influxdata/influxdb/v2/bolt"
 	"github.com/influxdata/influxdb/v2/chronograf/server"
 	"github.com/influxdata/influxdb/v2/cmd/influxd/inspect"
+	"github.com/influxdata/influxdb/v2/dbrp"
 	"github.com/influxdata/influxdb/v2/endpoints"
 	"github.com/influxdata/influxdb/v2/gather"
 	"github.com/influxdata/influxdb/v2/http"
@@ -774,6 +775,11 @@ func (m *Launcher) run(ctx context.Context) (err error) {
 		}
 	}
 
+	dbrpSvc, err := dbrp.NewService(ctx, m.kvStore)
+	if err != nil {
+		return err
+	}
+
 	var checkSvc platform.CheckService
 	{
 		coordinator := coordinator.NewCoordinator(m.log, m.scheduler, m.executor)
@@ -880,6 +886,7 @@ func (m *Launcher) run(ctx context.Context) (err error) {
 		BucketService:                   storage.NewBucketService(bucketSvc, m.engine),
 		SessionService:                  sessionSvc,
 		UserService:                     userSvc,
+		DBRPService:                     dbrpSvc,
 		OrganizationService:             orgSvc,
 		UserResourceMappingService:      userResourceSvc,
 		LabelService:                    labelSvc,

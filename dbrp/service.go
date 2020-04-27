@@ -6,7 +6,7 @@ import (
 
 	"github.com/influxdata/influxdb/v2"
 	"github.com/influxdata/influxdb/v2/kv"
-	"github.com/influxdata/influxdb/v2/rand"
+	"github.com/influxdata/influxdb/v2/snowflake"
 )
 
 var (
@@ -14,15 +14,23 @@ var (
 )
 
 type Service struct {
-	store          kv.Store
-	tokenGenerator influxdb.TokenGenerator
+	store kv.Store
+	IDGen influxdb.IDGenerator
 }
 
-func NewService(st kv.Store) influxdb.DBRPMappingServiceV2 {
-	return &Service{
-		store:          st,
-		tokenGenerator: rand.NewTokenGenerator(64),
+func NewService(ctx context.Context, st kv.Store) (influxdb.DBRPMappingServiceV2, error) {
+	if err := st.Update(ctx, func(tx kv.Tx) error {
+		if _, err := tx.Bucket(bucket); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
+	return &Service{
+		store: st,
+		IDGen: snowflake.NewDefaultIDGenerator(),
+	}, nil
 }
 
 // FindBy returns the dbrp mapping the for cluster, db and rp.
@@ -80,9 +88,13 @@ func (s *Service) FindMany(ctx context.Context, filter influxdb.DBRPMappingFilte
 
 // Create creates a new dbrp mapping, if a different mapping exists an error is returned.
 func (s *Service) Create(ctx context.Context, dbrp *influxdb.DBRPMapping) error {
+	dbrp.ID = s.IDGen.ID()
+	if err := dbrp.Validate(); err != nil {
+		return ErrInvalidDBRPIDError(err)
+	}
 	encodedID, err := dbrp.ID.Encode()
 	if err != nil {
-		return ErrInternalServiceError(err)
+		return ErrInvalidDBRPID
 	}
 	b, err := json.Marshal(dbrp)
 	if err != nil {

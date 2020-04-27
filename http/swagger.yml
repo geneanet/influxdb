@@ -347,10 +347,15 @@ paths:
       summary: List all database retention policy mapping
       parameters:
         - $ref: "#/components/parameters/TraceSpan"
+        - in: query
+          name: orgID
+          description: Specifies the organization ID of the template.
+          schema:
+            type: string
       responses:
         "200":
           description: A list of all database retention policy mappings
-          content:
+          dbrps:
             application/json:
               schema:
                 $ref: "#/components/schemas/DBRPs"

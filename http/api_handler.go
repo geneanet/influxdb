@@ -7,6 +7,7 @@ import (
 	"github.com/influxdata/influxdb/v2"
 	"github.com/influxdata/influxdb/v2/authorizer"
 	"github.com/influxdata/influxdb/v2/chronograf/server"
+	"github.com/influxdata/influxdb/v2/dbrp"
 	"github.com/influxdata/influxdb/v2/http/metric"
 	"github.com/influxdata/influxdb/v2/kit/prom"
 	kithttp "github.com/influxdata/influxdb/v2/kit/transport/http"
@@ -55,6 +56,7 @@ type APIBackend struct {
 	BackupService                   influxdb.BackupService
 	KVBackupService                 influxdb.KVBackupService
 	AuthorizationService            influxdb.AuthorizationService
+	DBRPService                     influxdb.DBRPMappingServiceV2
 	BucketService                   influxdb.BucketService
 	SessionService                  influxdb.SessionService
 	UserService                     influxdb.UserService
@@ -211,6 +213,8 @@ func NewAPIHandler(b *APIBackend, opts ...APIHandlerOptFn) *APIHandler {
 	backupBackend := NewBackupBackend(b)
 	backupBackend.BackupService = authorizer.NewBackupService(backupBackend.BackupService)
 	h.Mount(prefixBackup, NewBackupHandler(backupBackend))
+
+	h.Mount("/api/v2/dbrp", dbrp.NewHTTPDBRPHandler(b.Logger, b.DBRPService))
 
 	writeBackend := NewWriteBackend(b.Logger.With(zap.String("handler", "write")), b)
 	h.Mount(prefixWrite, NewWriteHandler(b.Logger, writeBackend,

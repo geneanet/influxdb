@@ -119,6 +119,7 @@ type DBRPMappingFilter struct {
 	Database        *string
 	RetentionPolicy *string
 	Default         *bool
+	OrgID           *ID
 }
 
 func (f DBRPMappingFilter) String() string {

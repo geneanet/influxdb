@@ -65,3 +65,11 @@ func ErrDBRPAlreadyExist(err error) *influxdb.Error {
 		Err:  fmt.Errorf("dbrp already exist for this particular ID. If you are trying an update use the right function .Update"),
 	}
 }
+
+// ErrInternalServiceError is used when the error comes from an internal system.
+func ErrInternalDBRPError(err error) *influxdb.Error {
+	return &influxdb.Error{
+		Code: influxdb.EInvalid,
+		Err:  err,
+	}
+}
