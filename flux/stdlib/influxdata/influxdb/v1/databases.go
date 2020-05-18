@@ -13,7 +13,7 @@ import (
 	"github.com/influxdata/flux/values"
 	"github.com/influxdata/influxdb/flux/stdlib/influxdata/influxdb"
 	"github.com/influxdata/influxdb/services/meta"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 const DatabasesKind = v1.DatabasesKind

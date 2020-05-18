@@ -6,7 +6,7 @@ import (
 
 	"github.com/influxdata/influxdb/models"
 	"github.com/influxdata/influxdb/tsdb"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // ConflictWriter is a Writer that redirects conflicting data to an alternate output.

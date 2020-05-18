@@ -4,7 +4,7 @@ import (
 	"errors"
 	"regexp"
 
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // RewriteStatement rewrites stmt into a new statement, if applicable.

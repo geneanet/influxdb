@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/influxdata/influxdb/query"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 func TestMath_TypeMapper(t *testing.T) {

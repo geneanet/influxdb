@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/influxdata/influxdb/query"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 func TestPointLimitMonitor(t *testing.T) {

@@ -40,7 +40,7 @@ import (
 	"github.com/influxdata/influxdb/storage/reads"
 	"github.com/influxdata/influxdb/storage/reads/datatypes"
 	"github.com/influxdata/influxdb/tsdb"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // Ensure the handler returns results from a query (including nil results).

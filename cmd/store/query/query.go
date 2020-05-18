@@ -19,7 +19,7 @@ import (
 	"github.com/influxdata/influxdb/models"
 	"github.com/influxdata/influxdb/services/storage"
 	"github.com/influxdata/influxdb/storage/reads/datatypes"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )

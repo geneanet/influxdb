@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/influxdata/influxdb/models"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 func exprEqual(x, y influxql.Expr) bool {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/influxdata/influxdb/query/internal/gota"
 	"github.com/influxdata/influxdb/query/neldermead"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // FieldMapper is a FieldMapper that wraps another FieldMapper and exposes

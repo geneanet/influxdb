@@ -1,6 +1,6 @@
 package query
 
-import "github.com/influxdata/influxql"
+import "github.com/geneanet/influxql"
 
 // castToType will coerce the underlying interface type to another
 // interface depending on the type.

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/influxdata/influxdb/models"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // CompileOptions are the customization options for the compiler.

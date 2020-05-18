@@ -8,7 +8,7 @@ import (
 
 	"github.com/influxdata/influxdb/logger"
 	"github.com/influxdata/influxdb/query"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 func BenchmarkIntegerIterator_Next(b *testing.B) {

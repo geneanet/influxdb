@@ -8,7 +8,7 @@ import (
 	"github.com/influxdata/influxdb/pkg/metrics"
 	"github.com/influxdata/influxdb/query"
 	"github.com/influxdata/influxdb/tsdb"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 type arrayCursorIterator struct {

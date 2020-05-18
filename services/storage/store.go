@@ -15,7 +15,7 @@ import (
 	"github.com/influxdata/influxdb/storage/reads/datatypes"
 	"github.com/influxdata/influxdb/tsdb"
 	"github.com/influxdata/influxdb/tsdb/cursors"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	"go.uber.org/zap"
 )
 

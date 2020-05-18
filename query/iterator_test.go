@@ -12,7 +12,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/influxdata/influxdb/pkg/deep"
 	"github.com/influxdata/influxdb/query"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // Ensure that a set of iterators can be merged together, sorted by window and name/tag.

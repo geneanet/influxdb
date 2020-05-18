@@ -10,7 +10,7 @@ import (
 	"github.com/influxdata/influxdb/storage/reads"
 	"github.com/influxdata/influxdb/storage/reads/datatypes"
 	"github.com/influxdata/influxdb/tsdb"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	opentracing "github.com/opentracing/opentracing-go"
 )
 

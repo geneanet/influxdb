@@ -8,7 +8,7 @@ import (
 
 	"github.com/influxdata/influxdb/pkg/pool"
 	"github.com/influxdata/influxdb/tsdb"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 const (

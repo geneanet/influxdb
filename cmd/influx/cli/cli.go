@@ -28,7 +28,7 @@ import (
 	"github.com/influxdata/influxdb/client"
 	v8 "github.com/influxdata/influxdb/importer/v8"
 	"github.com/influxdata/influxdb/models"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	"github.com/peterh/liner"
 )
 

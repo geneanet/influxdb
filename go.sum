@@ -70,6 +70,12 @@ github.com/eclipse/paho.mqtt.golang v1.2.0/go.mod h1:H9keYFcgq3Qr5OUJm/JZI/i6U7j
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90/go.mod h1:R/bRT+9gY/C5z7JzPU0zXsXHKM4/ayA+zqcVNZzPa1k=
+github.com/geneanet/influxql v1.1.0-group-alias-field h1:djfsNlD08qWeYdSt2BMNF8CtHRBg7A+43WUCBPp9G4I=
+github.com/geneanet/influxql v1.1.0-group-alias-field/go.mod h1:sZJNAQHhThXpm2JDfKu8fXcTPMP/m/GLhrUgp0ji8nc=
+github.com/geneanet/influxql v1.1.0-group-alias-field-1 h1:SHdjA3DNckiC5IiJXSrsVHu7bH7dvlIxnpsjSf2hQEE=
+github.com/geneanet/influxql v1.1.0-group-alias-field-1/go.mod h1:sZJNAQHhThXpm2JDfKu8fXcTPMP/m/GLhrUgp0ji8nc=
+github.com/geneanet/influxql v1.1.0 h1:sPsaumLFRPMwR5QtD3Up54HXpNND8Eu7G1vQFmi3quQ=
+github.com/geneanet/influxql v1.1.0/go.mod h1:KpVI7okXjK6PRi3Z5B+mtKZli+R1DnZgb3N+tzevNgo=
 github.com/glycerine/go-unsnap-stream v0.0.0-20180323001048-9f0cb55181dd h1:r04MMPyLHj/QwZuMJ5+7tJcBr1AQjpiAK/rZWRrQT7o=
 github.com/glycerine/go-unsnap-stream v0.0.0-20180323001048-9f0cb55181dd/go.mod h1:/20jfyN9Y5QPEAprSgKAUr+glWDY39ZiUEAYOEv5dsE=
 github.com/glycerine/goconvey v0.0.0-20190410193231-58a59202ab31 h1:gclg6gY70GLy3PbkQ1AERPfmLMMagS60DKF78eWwLn8=

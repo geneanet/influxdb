@@ -4,7 +4,7 @@ import (
 	"regexp"
 
 	"github.com/influxdata/influxdb/storage/reads/datatypes"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	"github.com/pkg/errors"
 )
 

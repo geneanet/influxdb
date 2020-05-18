@@ -7,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 func (p *preparedStatement) Explain() (string, error) {

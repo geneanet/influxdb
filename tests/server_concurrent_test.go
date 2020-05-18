@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/influxdata/influxdb/query"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 func TestConcurrentServer_WriteValues(t *testing.T) {

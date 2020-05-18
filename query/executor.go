@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/influxdata/influxdb/models"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	"go.uber.org/zap"
 )
 

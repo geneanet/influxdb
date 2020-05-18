@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/influxdata/influxdb/models"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // FieldValidator should return a PartialWriteError if the point should not be written.

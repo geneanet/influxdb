@@ -27,7 +27,7 @@ import (
 	"github.com/influxdata/influxdb/tsdb"
 	"github.com/influxdata/influxdb/tsdb/engine/tsm1"
 	"github.com/influxdata/influxdb/tsdb/index/inmem"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // Ensure that deletes only sent to the WAL will clear out the data from the cache on restart

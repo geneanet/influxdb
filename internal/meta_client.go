@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/influxdata/influxdb/services/meta"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // MetaClientMock is a mockable implementation of meta.MetaClient.

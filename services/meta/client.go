@@ -20,7 +20,7 @@ import (
 	"github.com/influxdata/influxdb"
 	"github.com/influxdata/influxdb/logger"
 	"github.com/influxdata/influxdb/pkg/file"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )

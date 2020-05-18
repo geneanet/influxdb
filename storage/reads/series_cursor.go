@@ -5,7 +5,7 @@ import (
 
 	"github.com/influxdata/influxdb/models"
 	"github.com/influxdata/influxdb/tsdb/cursors"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 type SeriesCursor interface {

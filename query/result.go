@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/influxdata/influxdb/models"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 const (

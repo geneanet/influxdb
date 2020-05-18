@@ -17,7 +17,7 @@ import (
 	"github.com/influxdata/influxdb/models"
 	"github.com/influxdata/influxdb/query"
 	internal "github.com/influxdata/influxdb/services/meta/internal"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 //go:generate protoc --gogo_out=. internal/meta.proto

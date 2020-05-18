@@ -2,7 +2,7 @@ package storage
 
 import (
 	"github.com/influxdata/influxdb/models"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 var measurementRemap = map[string]string{

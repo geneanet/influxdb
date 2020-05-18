@@ -19,7 +19,7 @@ import (
 	"github.com/influxdata/influxdb/models"
 	"github.com/influxdata/influxdb/pkg/escape"
 	"github.com/influxdata/influxdb/tsdb/engine/tsm1"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // Command represents the program execution for "influx_inspect export".

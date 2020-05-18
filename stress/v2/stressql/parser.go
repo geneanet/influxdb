@@ -10,7 +10,7 @@ import (
 
 	"github.com/influxdata/influxdb/stress/v2/statement"
 	stressql "github.com/influxdata/influxdb/stress/v2/stressql/statement"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 // Token represents a lexical token.

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/influxdata/influxdb/query/internal/gota"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 )
 
 /*

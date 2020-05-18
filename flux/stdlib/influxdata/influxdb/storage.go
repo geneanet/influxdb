@@ -10,7 +10,7 @@ import (
 	"github.com/influxdata/flux/semantic"
 	"github.com/influxdata/influxdb/services/meta"
 	"github.com/influxdata/influxdb/tsdb/cursors"
-	"github.com/influxdata/influxql"
+	"github.com/geneanet/influxql"
 	"github.com/pkg/errors"
 )
 
